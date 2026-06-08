@@ -1,81 +1,38 @@
-# backend/main.py
-
 import time
 
-from simulation.orbital.satellite import Satellite
-from simulation.orbital.constellation_manager import ConstellationManager
-from simulation.orbital.orbit_propagator import OrbitPropagator
-from simulation.orbital.tle_loader import TLELoader
-from simulation.orbital.orbit_propagator import OrbitPropagator
 from simulation.scheduler.simulation_clock import SimulationClock
 
+from simulation.orbital.tle_loader import TLELoader
+from simulation.orbital.satellite_factory import SatelliteFactory
+from simulation.orbital.constellation_manager import ConstellationManager
+from simulation.orbital.orbit_propagator import OrbitPropagator
+from simulation.routing.graph_builder import GraphBuilder
 
-def create_initial_constellation():
-    satellites = [
-        Satellite(
-            satellite_id="SAT-001",
-            latitude=0.0,
-            longitude=0.0,
-            altitude=550.0,
-            velocity=1.2,
-            health_status="ACTIVE",
-            timestamp=0
-        ),
-        Satellite(
-            satellite_id="SAT-002",
-            latitude=15.0,
-            longitude=20.0,
-            altitude=550.0,
-            velocity=1.1,
-            health_status="ACTIVE",
-            timestamp=0
-        ),
-        Satellite(
-            satellite_id="SAT-003",
-            latitude=-10.0,
-            longitude=40.0,
-            altitude=550.0,
-            velocity=1.3,
-            health_status="ACTIVE",
-            timestamp=0
-        ),
-        Satellite(
-            satellite_id="SAT-004",
-            latitude=30.0,
-            longitude=60.0,
-            altitude=550.0,
-            velocity=1.0,
-            health_status="ACTIVE",
-            timestamp=0
-        ),
-        Satellite(
-            satellite_id="SAT-005",
-            latitude=-25.0,
-            longitude=80.0,
-            altitude=550.0,
-            velocity=1.4,
-            health_status="ACTIVE",
-            timestamp=0
-        ),
-    ]
-
-    return satellites
-
-
-def run_simulation():
+def run_real_constellation():
 
     clock = SimulationClock()
+
+    loader = TLELoader()
+
+    factory = SatelliteFactory()
 
     constellation_manager = ConstellationManager()
 
     propagator = OrbitPropagator()
 
-    satellites = create_initial_constellation()
+    records = loader.load_tle_file(
+        "simulation/data/satellites.tle"
+    )
+
+    satellites = factory.create_satellites(records)
 
     for satellite in satellites:
         constellation_manager.add_satellite(satellite)
 
-    print("OrbitalNet Simulation Started...\n")
+    print(
+        f"\nOrbitalNet Started "
+        f"({constellation_manager.satellite_count()} satellites loaded)\n"
+    )
 
     MAX_TICKS = 10
 
@@ -83,43 +40,30 @@ def run_simulation():
 
         clock.tick()
 
-        print(f"\n===== SIMULATION TIME: {clock.current_time} =====")
+        print(
+            f"\n===== SIMULATION TIME: "
+            f"{clock.current_time} ====="
+        )
 
         for satellite in constellation_manager.get_all_satellites():
 
-            propagator.propagate(
-                satellite=satellite,
-                delta_time=1
+            propagator.update_position(
+                satellite
             )
 
             print(
                 f"{satellite.satellite_id} | "
-                f"Lat: {satellite.latitude:.2f} | "
-                f"Lon: {satellite.longitude:.2f} | "
-                f"Alt: {satellite.altitude:.2f} km"
+                f"Lat: {satellite.latitude:.4f} | "
+                f"Lon: {satellite.longitude:.4f} | "
+                f"Alt: {satellite.altitude_km:.2f} km"
             )
 
         time.sleep(1)
 
     print("\nSimulation Complete.")
 
-
-def test_tle_loader():
-
-    loader = TLELoader()
-
-    satellites = loader.load_tle_file(
-        "simulation/data/satellites.tle"
-    )
-
-    print("\nLoaded TLE Satellites:\n")
-
-    for satellite in satellites:
-        print(satellite)
-        print("-" * 60)
-
-
-def test_orbit_propagator():
+# --------- inplementing the graph builder------------#
+def test_graph_builder():
 
     loader = TLELoader()
 
@@ -127,22 +71,25 @@ def test_orbit_propagator():
         "simulation/data/satellites.tle"
     )
 
-    propagator = OrbitPropagator()
+    factory = SatelliteFactory()
 
-    print("\nCurrent Satellite Positions\n")
+    satellites = factory.create_satellites(records)
 
-    for record in records:
+    graph_builder = GraphBuilder()
 
-        position = propagator.get_position(record)
+    graph = graph_builder.build_graph(
+        satellites
+    )
 
-        print(position)
+    print("\nGraph Nodes:\n")
+
+    for node in graph.nodes:
+        print(node)
+
 
 def main():
-     test_orbit_propagator()
-    # test_tle_loader()
-    # use run simulator in case for the test_tle_loader
-    # run_simulation()  
-
+    # run_real_constellation()
+    test_graph_builder()
 
 if __name__ == "__main__":
     main()
