@@ -13,3 +13,6 @@ class Satellite:
     health_status: str
 
     timestamp: float
+
+    tle_line1: str = ""
+    tle_line2: str = ""

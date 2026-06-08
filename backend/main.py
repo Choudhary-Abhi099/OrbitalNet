@@ -1,7 +1,11 @@
+# backend/main.py
+
 import time
 
 from simulation.orbital.satellite import Satellite
 from simulation.orbital.constellation_manager import ConstellationManager
+from simulation.orbital.orbit_propagator import OrbitPropagator
+from simulation.orbital.tle_loader import TLELoader
 from simulation.orbital.orbit_propagator import OrbitPropagator
 from simulation.scheduler.simulation_clock import SimulationClock
 
@@ -58,7 +62,8 @@ def create_initial_constellation():
     return satellites
 
 
-def main():
+def run_simulation():
+
     clock = SimulationClock()
 
     constellation_manager = ConstellationManager()
@@ -73,7 +78,9 @@ def main():
     print("OrbitalNet Simulation Started...\n")
 
     MAX_TICKS = 10
+
     while clock.current_time < MAX_TICKS:
+
         clock.tick()
 
         print(f"\n===== SIMULATION TIME: {clock.current_time} =====")
@@ -93,6 +100,48 @@ def main():
             )
 
         time.sleep(1)
+
+    print("\nSimulation Complete.")
+
+
+def test_tle_loader():
+
+    loader = TLELoader()
+
+    satellites = loader.load_tle_file(
+        "simulation/data/satellites.tle"
+    )
+
+    print("\nLoaded TLE Satellites:\n")
+
+    for satellite in satellites:
+        print(satellite)
+        print("-" * 60)
+
+
+def test_orbit_propagator():
+
+    loader = TLELoader()
+
+    records = loader.load_tle_file(
+        "simulation/data/satellites.tle"
+    )
+
+    propagator = OrbitPropagator()
+
+    print("\nCurrent Satellite Positions\n")
+
+    for record in records:
+
+        position = propagator.get_position(record)
+
+        print(position)
+
+def main():
+     test_orbit_propagator()
+    # test_tle_loader()
+    # use run simulator in case for the test_tle_loader
+    # run_simulation()  
 
 
 if __name__ == "__main__":

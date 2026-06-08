@@ -1,17 +1,28 @@
-# orbit_propagator.py
+from skyfield.api import EarthSatellite
+from skyfield.api import load
 
 class OrbitPropagator:
+    def __init__(self):
+        self.ts = load.timescale()
 
-    def propagate(self, satellite, delta_time):
+    def get_position(self, tle_record):
 
-        satellite.longitude += (
-            satellite.velocity * delta_time
+        satellite = EarthSatellite(
+            tle_record["line1"],
+            tle_record["line2"],
+            tle_record["name"],
+            self.ts
         )
 
-        if satellite.longitude > 180:
-            satellite.longitude -= 360
+        t = self.ts.now()
 
-        satellite.timestamp += delta_time
+        geocentric = satellite.at(t)
 
-def get_all_satellites(self):
-    return self.satellites.values() 
+        subpoint = geocentric.subpoint()
+
+        return {
+            "name": tle_record["name"],
+            "latitude": float(subpoint.latitude.degrees),
+            "longitude": float(subpoint.longitude.degrees),
+            "altitude_km": float(subpoint.elevation.km)
+        }
