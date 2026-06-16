@@ -16,6 +16,8 @@ from simulation.routing.best_ground_station_selector import (BestGroundStationSe
 from simulation.routing.end_to_end_route import (EndToEndRouter)
 from analytics.route_statics import (RouteStatistics)
 from simulation.routing.load_balancer import (LoadBalancer)
+from simulation.routing.fault_tolerance import (FaultToleranceManager)
+from simulation.routing.satellite_route_manager import (SatelliteRouteManager)
  #------------Code Line -----------------
 def run_real_constellation():
 
@@ -483,7 +485,6 @@ def test_ground_station_selection():
             f"{result['distance_km']:.2f} km"
         )
 
-
 def test_end_to_end_routes():
 
     loader = TLELoader()
@@ -595,9 +596,161 @@ def test_end_to_end_routes():
             f"{station}: {count} users"
         )
 
+def test_fault_tolerance():
+
+    loader = TLELoader()
+
+    records = loader.load_tle_file(
+        "simulation/data/satellites.tle"
+    )
+
+    factory = SatelliteFactory()
+
+    satellites = factory.create_satellites(
+        records
+    )
+
+    propagator = OrbitPropagator()
+
+    for satellite in satellites:
+        propagator.update_position(
+            satellite
+        )
+
+    user = UserTerminal(
+        user_id="USER-001",
+        latitude=28.6139,
+        longitude=77.2090
+    )
+
+    selector = BestSatelliteSelector()
+
+    result = (
+        selector.select_best_satellite(
+            user,
+            satellites
+        )
+    )
+
+    print(
+        "\nOriginal Satellite:"
+    )
+
+    print(
+        result["satellite"].satellite_id
+    )
+
+    fault_manager = (
+        FaultToleranceManager()
+    )
+
+    fault_manager.fail_satellite(
+        result["satellite"]
+    )
+
+    active_satellites = (
+        fault_manager
+        .get_active_satellites(
+            satellites
+        )
+    )
+
+    new_result = (
+        selector.select_best_satellite(
+            user,
+            active_satellites
+        )
+    )
+
+    print(
+        "\nAfter Failure:"
+    )
+
+    print(
+        new_result["satellite"]
+        .satellite_id
+    )
+
+#----------Muti-hoop routing ---------
+def test_satellite_routing():
+
+    loader = TLELoader()
+
+    records = loader.load_tle_file(
+        "simulation/data/satellites.tle"
+    )
+
+    factory = SatelliteFactory()
+
+    satellites = factory.create_satellites(
+        records
+    )
+
+    propagator = OrbitPropagator()
+
+    for satellite in satellites:
+
+        propagator.update_position(
+            satellite
+        )
+
+    graph_builder = GraphBuilder()
+
+    graph = graph_builder.build_graph(
+        satellites
+    )
+
+    nodes = list(graph.nodes)
+
+    print(
+        f"\nTotal Satellites: "
+        f"{graph.number_of_nodes()}"
+    )
+
+    print(
+        f"Total Links: "
+        f"{graph.number_of_edges()}"
+    )
+
+    avg_degree = (
+        2 * graph.number_of_edges()
+    ) / graph.number_of_nodes()
+
+    print(
+        f"Average Degree: "
+        f"{avg_degree:.2f}"
+    )
+
+    source = nodes[0]
+    destination = nodes[-1]
+
+    print(
+        f"\nSource: {source}"
+    )
+
+    print(
+        f"Destination: {destination}"
+    )
+
+    route_manager = (
+        SatelliteRouteManager()
+    )
+
+    route = (
+        route_manager.build_route(
+            graph,
+            source,
+            destination
+        )
+    )
+
+    print("\nRoute:")
+
+    print(route)
+
 def main():
     # run_real_constellation()
-    test_end_to_end_routes()
+    test_satellite_routing()
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,3 @@
-# this is the function that calculates the neighbour nodes (i.e statellites that are closer to each other) and the 
 import networkx as nx
 
 from simulation.routing.distance_calculator import (
@@ -8,7 +7,7 @@ from simulation.routing.distance_calculator import (
 
 class GraphBuilder:
 
-    MAX_ISL_DISTANCE = 20000
+    NEIGHBOR_COUNT = 4
 
     def __init__(self):
 
@@ -22,39 +21,58 @@ class GraphBuilder:
 
         self.graph.clear()
 
-        # Add nodes 
+        # Add nodes
         for satellite in satellites:
 
             self.graph.add_node(
                 satellite.satellite_id,
-                satellite = satellite
+                satellite=satellite
             )
 
-        # Add edges
-        for i in range(len(satellites)):
+        # Add edges using nearest neighbors
 
-            for j in range(i + 1, len(satellites)):
+        for satellite in satellites:
 
-                sat1 = satellites[i]
-                sat2 = satellites[j]
+            neighbors = []
+
+            for other_satellite in satellites:
+
+                if satellite == other_satellite:
+                    continue
 
                 distance = (
                     self.distance_calculator
                     .calculate_distance(
-                        sat1,
-                        sat2
+                        satellite,
+                        other_satellite
                     )
                 )
 
-                if distance <= self.MAX_ISL_DISTANCE:
-
-                    self.graph.add_edge(
-                        sat1.satellite_id,
-                        sat2.satellite_id,
-                        distance_km=distance
+                neighbors.append(
+                    (
+                        other_satellite,
+                        distance
                     )
+                )
+
+            neighbors.sort(
+                key=lambda x: x[1]
+            )
+
+            nearest_neighbors = (
+                neighbors[:self.NEIGHBOR_COUNT]
+            )
+
+            for neighbor, distance in nearest_neighbors:
+
+                self.graph.add_edge(
+                    satellite.satellite_id,
+                    neighbor.satellite_id,
+                    distance_km=distance
+                )
 
         return self.graph
 
     def get_graph(self):
+
         return self.graph
