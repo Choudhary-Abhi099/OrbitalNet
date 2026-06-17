@@ -1,4 +1,5 @@
 import time
+import sqlite3 
 from simulation.scheduler.simulation_clock import SimulationClock
 from simulation.orbital.tle_loader import TLELoader
 from simulation.orbital.satellite_factory import SatelliteFactory
@@ -18,6 +19,11 @@ from analytics.route_statics import (RouteStatistics)
 from simulation.routing.load_balancer import (LoadBalancer)
 from simulation.routing.fault_tolerance import (FaultToleranceManager)
 from simulation.routing.satellite_route_manager import (SatelliteRouteManager)
+from integration.event_bus import (EventBus)
+from integration.events import (SATELLITE_FAILED)
+from integration.event_handlers import (satellite_failure_handler)
+from analytics.telemetry_query_service import (TelemetryQueryService)
+
  #------------Code Line -----------------
 def run_real_constellation():
 
@@ -624,6 +630,12 @@ def test_fault_tolerance():
     )
 
     selector = BestSatelliteSelector()
+    event_bus = EventBus()
+
+    event_bus.subscribe(
+        SATELLITE_FAILED,
+        satellite_failure_handler
+    )
 
     result = (
         selector.select_best_satellite(
@@ -646,6 +658,13 @@ def test_fault_tolerance():
 
     fault_manager.fail_satellite(
         result["satellite"]
+    )
+
+    event_bus.publish(
+        SATELLITE_FAILED,
+        {
+            "satellite": result["satellite"]
+        }
     )
 
     active_satellites = (
@@ -748,9 +767,56 @@ def test_satellite_routing():
 
     print(route)
 
+#---------database recording ------------
+def test_telemetry_database():
+
+    conn = sqlite3.connect(
+        "database/telemetry.db"
+    )
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM telemetry_events
+        """
+    )
+
+    rows = cursor.fetchall()
+
+    print(
+        "\nTelemetry Events:\n"
+    )
+
+    for row in rows:
+        print(row)
+
+    conn.close()
+
+#--------------Query testing -------------
+def test_telemetry_queries():
+
+    service = (
+        TelemetryQueryService()
+    )
+
+    print(
+        f"\nTotal Events: "
+        f"{service.total_events()}"
+    )
+
+    print(
+        "\nAll Events:\n"
+    )
+
+    for event in service.all_events():
+
+        print(event)
+
 def main():
     # run_real_constellation()
-    test_satellite_routing()
+    test_telemetry_queries()
 
 if __name__ == "__main__":
     main()
