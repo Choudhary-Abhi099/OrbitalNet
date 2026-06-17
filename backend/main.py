@@ -816,7 +816,7 @@ def test_telemetry_queries():
 
 def main():
     # run_real_constellation()
-    test_telemetry_queries()
+    test_satellite_routing()
 
 if __name__ == "__main__":
     main()

@@ -105,3 +105,30 @@ class TelemetryRepository:
         conn.close()
 
         return count
+    
+    def latest_events(
+    self,
+    limit=10
+    ):
+
+        conn = sqlite3.connect(
+            self.db_path
+        )
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT *
+            FROM telemetry_events
+            ORDER BY id DESC
+            LIMIT ?
+            """,
+            (limit,)
+        )
+
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        return rows

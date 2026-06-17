@@ -20,3 +20,22 @@ class TelemetryQueryService:
             self.repository
             .get_all_events()
         )
+    def latest_events(
+        self,
+        limit=10
+    ):
+
+        return (
+            self.repository
+            .latest_events(limit)
+        )
+    
+    def latest_events(
+    self,
+    limit=10
+    ):
+
+        return (
+            self.repository
+            .latest_events(limit)
+        )
