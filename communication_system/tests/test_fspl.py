@@ -2,12 +2,18 @@ from communication_system.propagation_engine.fspl import (
     calculate_fspl
 )
 
-distance = 1000      # km
-frequency = 12000    # MHz (Ku Band)
 
-loss = calculate_fspl(
-    distance,
-    frequency
-)
+def test_fspl():
 
-print(f"FSPL = {loss:.2f} dB")
+    loss = calculate_fspl(
+        distance_km=1000,
+        frequency_ghz=12
+    )
+
+    assert loss > 100
+    assert loss < 200
+
+
+if __name__ == "__main__":
+    test_fspl()
+    print("test_fspl passed")

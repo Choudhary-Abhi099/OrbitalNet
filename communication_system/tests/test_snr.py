@@ -3,19 +3,30 @@ from communication_system.signal_metrics.snr import (
     classify_link_quality
 )
 
-snr = calculate_snr(
-    received_power_dbm=-79,
-    noise_power_dbm=-100
-)
 
-quality = classify_link_quality(
-    snr
-)
+def test_snr():
 
-print(
-    f"SNR = {snr:.2f} dB"
-)
+    snr = calculate_snr(
+        received_power_dbm=-30,
+        noise_power_dbm=-100
+    )
 
-print(
-    f"Quality = {quality}"
-)
+    print("Calculated SNR =", snr)
+
+    assert snr == 70
+
+
+def test_link_quality():
+
+    quality = classify_link_quality(25)
+
+    print("Link Quality =", quality)
+
+    assert quality == "Excellent"
+
+
+if __name__ == "__main__":
+    test_snr()
+    test_link_quality()
+
+    print("✅ test_snr passed")

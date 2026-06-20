@@ -1,16 +1,36 @@
+# snr.py
+
 def calculate_snr(
     received_power_dbm,
     noise_power_dbm
 ):
+    """
+    Calculate Signal-to-Noise Ratio.
 
-    snr = (
+    Parameters
+    ----------
+    received_power_dbm : float
+
+    noise_power_dbm : float
+
+    Returns
+    -------
+    float
+        SNR in dB
+    """
+
+    return (
         received_power_dbm
         - noise_power_dbm
     )
 
-    return snr
 
-def classify_link_quality(snr_db):
+def classify_link_quality(
+    snr_db
+):
+    """
+    Classify communication quality.
+    """
 
     if snr_db >= 20:
         return "Excellent"
@@ -21,5 +41,4 @@ def classify_link_quality(snr_db):
     elif snr_db >= 5:
         return "Fair"
 
-    else:
-        return "Poor"
+    return "Poor"
