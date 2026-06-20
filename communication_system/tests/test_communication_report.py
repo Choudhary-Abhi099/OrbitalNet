@@ -16,3 +16,5 @@ report = generate_communication_report(
 
 for key, value in report.items():
     print(f"{key}: {value}")
+
+
