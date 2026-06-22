@@ -16,3 +16,8 @@ class SimulationClock:
         self.current_time += 1
 
         self.position_service.update_all_positions()
+
+        print(
+            f"[CLOCK] Tick "
+            f"{self.current_time}"
+        )

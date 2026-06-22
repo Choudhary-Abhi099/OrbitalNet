@@ -7,7 +7,9 @@ from integration.telemetry_adapter import (
 from simulation.routing.graph_builder import (
     GraphBuilder
 )
-
+from backend.services.network_state_service import (
+    network_state_service
+)
 graph_builder = GraphBuilder()
 telemetry_adapter = (
     TelemetryAdapter()
@@ -125,6 +127,10 @@ def constellation_updated_handler(
         .build_graph(
             satellites
         )
+    )
+
+    network_state_service.update_graph(
+        graph
     )
 
     print(

@@ -5,7 +5,7 @@ from analytics.network_statistics_service import (
 )
 
 from backend.services.network_state_service import (
-    NetworkStateService
+    network_state_service
 )
 
 from analytics.network_health_service import (
@@ -17,10 +17,6 @@ stats_service = (
     NetworkStatisticsService()
 )
 
-state_service = (
-    NetworkStateService()
-)
-
 health_service = (
     NetworkHealthService()
 )
@@ -29,8 +25,17 @@ health_service = (
 def network_statistics():
 
     graph = (
-        state_service.get_graph()
+        network_state_service.get_graph()
     )
+    print(
+        network_state_service.get_graph()
+    )
+    if graph is None:
+
+        return {
+            "message":
+            "Network graph not initialized"
+        }
 
     return (
         stats_service.build_statistics(
@@ -42,8 +47,14 @@ def network_statistics():
 def network_health():
 
     graph = (
-        state_service.get_graph()
+        network_state_service.get_graph()
     )
+
+    if graph is None:
+        return{
+            "message":
+            "Network graph is not initalized"
+        }
 
     return (
         health_service
