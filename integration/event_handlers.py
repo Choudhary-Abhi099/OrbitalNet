@@ -4,7 +4,11 @@ from integration.routing_adapter import (
 from integration.telemetry_adapter import (
     TelemetryAdapter
 )
+from simulation.routing.graph_builder import (
+    GraphBuilder
+)
 
+graph_builder = GraphBuilder()
 telemetry_adapter = (
     TelemetryAdapter()
 )
@@ -88,4 +92,43 @@ def link_recovered_handler(data):
     telemetry_adapter.record_event(
         "LINK_RECOVERED",
         data
+    )
+
+def satellite_position_updated_handler(
+        data
+    ):
+
+        satellite = data[
+        "satellite"
+        ]
+
+        print(
+            f"[POSITION UPDATED] "
+            f"{satellite.satellite_id}"
+        )
+
+def constellation_updated_handler(
+    data
+):
+
+    constellation_manager = data[
+        "constellation_manager"
+    ]
+
+    satellites = (
+        constellation_manager
+        .get_all_satellites()
+    )
+
+    graph = (
+        graph_builder
+        .build_graph(
+            satellites
+        )
+    )
+
+    print(
+        f"[ROUTING] Graph rebuilt "
+        f"Nodes={graph.number_of_nodes()} "
+        f"Links={graph.number_of_edges()}"
     )

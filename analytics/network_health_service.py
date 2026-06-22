@@ -6,52 +6,28 @@ from analytics.network_statistics_service import (
     NetworkStatisticsService
 )
 
-
 class NetworkHealthService:
 
-    def __init__(
-        self,
-        constellation_manager,
-        graph
-    ):
+    def __init__(self):
 
         self.telemetry = (
             TelemetryQueryService()
         )
 
-        self.statistics = (
-            NetworkStatisticsService(
-                constellation_manager,
-                graph
-            )
+        self.network_stats = (
+            NetworkStatisticsService()
         )
 
-    def get_health_report(self):
-
-        low_snr = (
-            self.telemetry
-            .count_events_by_type(
-                "LOW_SNR"
-            )
-        )
-
-        link_down = (
-            self.telemetry
-            .count_events_by_type(
-                "LINK_DOWN"
-            )
-        )
-
-        link_recovered = (
-            self.telemetry
-            .count_events_by_type(
-                "LINK_RECOVERED"
-            )
-        )
+    def build_health_report(
+        self,
+        graph
+    ):
 
         stats = (
-            self.statistics
-            .get_statistics()
+            self.network_stats
+            .build_statistics(
+                graph
+            )
         )
 
         return {
@@ -65,12 +41,25 @@ class NetworkHealthService:
             "average_degree":
             stats["average_degree"],
 
+            "total_events":
+            self.telemetry
+            .total_events(),
+
             "low_snr_events":
-            low_snr,
+            self.telemetry
+            .count_events_by_type(
+                "LOW_SNR"
+            ),
 
             "link_down_events":
-            link_down,
+            self.telemetry
+            .count_events_by_type(
+                "LINK_DOWN"
+            ),
 
             "link_recovered_events":
-            link_recovered
+            self.telemetry
+            .count_events_by_type(
+                "LINK_RECOVERED"
+            )
         }

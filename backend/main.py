@@ -23,7 +23,6 @@ from integration.event_bus import (EventBus)
 from integration.events import (SATELLITE_FAILED)
 from integration.event_handlers import (satellite_failure_handler)
 from analytics.telemetry_query_service import (TelemetryQueryService)
-
  #------------Code Line -----------------
 def run_real_constellation():
 
