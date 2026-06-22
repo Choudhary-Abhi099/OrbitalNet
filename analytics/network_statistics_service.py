@@ -27,3 +27,16 @@ class NetworkStatisticsService:
                 2
             )
         }
+    
+    def count_events_by_type(
+        self,
+        event_type
+    ):
+
+        return (
+            self.repository
+            .count_events_by_type(
+                event_type
+            )
+        )
+   

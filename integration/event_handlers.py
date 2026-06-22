@@ -33,3 +33,59 @@ def satellite_failure_handler(
         "SATELLITE_FAILED",
         data
     )
+
+def low_snr_handler(data):
+
+    satellite_id = data[
+        "satellite_id"
+    ]
+
+    snr = data[
+        "snr"
+    ]
+
+    print(
+        f"\n[EVENT] "
+        f"LOW SNR: "
+        f"{satellite_id} "
+        f"(SNR={snr})"
+    )
+
+    telemetry_adapter.record_event(
+        "LOW_SNR",
+        data
+    )
+
+def link_down_handler(data):
+
+    satellite_id = data[
+        "satellite_id"
+    ]
+
+    print(
+        f"\n[EVENT] "
+        f"LINK DOWN: "
+        f"{satellite_id}"
+    )
+
+    telemetry_adapter.record_event(
+        "LINK_DOWN",
+        data
+    )
+
+def link_recovered_handler(data):
+
+    satellite_id = data[
+        "satellite_id"
+    ]
+
+    print(
+        f"\n[EVENT] "
+        f"LINK RECOVERED: "
+        f"{satellite_id}"
+    )
+
+    telemetry_adapter.record_event(
+        "LINK_RECOVERED",
+        data
+    )

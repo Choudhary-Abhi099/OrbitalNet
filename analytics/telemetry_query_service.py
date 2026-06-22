@@ -30,12 +30,14 @@ class TelemetryQueryService:
             .latest_events(limit)
         )
     
-    def latest_events(
-    self,
-    limit=10
+    def count_events_by_type(
+        self,
+        event_type
     ):
 
         return (
             self.repository
-            .latest_events(limit)
+            .count_events_by_type(
+                event_type
+            )
         )

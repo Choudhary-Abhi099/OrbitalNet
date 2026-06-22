@@ -132,3 +132,29 @@ class TelemetryRepository:
         conn.close()
 
         return rows
+    
+    def count_events_by_type(
+        self,
+        event_type
+    ):
+
+        conn = sqlite3.connect(
+            self.db_path
+        )
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            """
+            SELECT COUNT(*)
+            FROM telemetry_events
+            WHERE event_type = ?
+            """,
+            (event_type,)
+        )
+
+        count = cursor.fetchone()[0]
+
+        conn.close()
+
+        return count
