@@ -1,3 +1,4 @@
+import asyncio
 from integration.routing_adapter import (
     RoutingAdapter
 )
@@ -9,6 +10,14 @@ from simulation.routing.graph_builder import (
 )
 from backend.services.network_state_service import (
     network_state_service
+)
+
+from backend.websocket.connection_manager import (
+    manager
+)
+
+from backend.services.live_stats_service import (
+    live_stats_service
 )
 graph_builder = GraphBuilder()
 telemetry_adapter = (
@@ -131,6 +140,25 @@ def constellation_updated_handler(
 
     network_state_service.update_graph(
         graph
+    )
+    stats = {
+        "satellites":
+        graph.number_of_nodes(),
+
+        "links":
+        graph.number_of_edges(),
+
+        "average_degree":
+        round(
+            (
+                2 * graph.number_of_edges()
+            ) /
+            graph.number_of_nodes(),
+            2
+        )
+    }
+    live_stats_service.update(
+        stats
     )
 
     print(

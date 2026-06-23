@@ -32,6 +32,10 @@ from backend.services.network_state_service import (
     network_state_service
 )
 
+from backend.websocket.simulation_ws import (
+    router as websocket_router
+)
+
 app = FastAPI()
 
 
@@ -89,4 +93,7 @@ app.include_router(
 
 app.include_router(
     network_router
+)
+app.include_router(
+    websocket_router
 )
