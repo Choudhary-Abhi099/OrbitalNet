@@ -36,8 +36,33 @@ from backend.websocket.simulation_ws import (
     router as websocket_router
 )
 
+from fastapi.middleware.cors import (
+    CORSMiddleware
+)
+
+from backend.api.connectivity_api import (
+    router as connectivity_router
+)
+
+from backend.api.communication_api import (
+    router as communication_router
+)
+
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+
+    allow_credentials=True,
+
+    allow_methods=["*"],
+
+    allow_headers=["*"]
+)
 
 @app.on_event("startup")
 def startup():
@@ -96,4 +121,12 @@ app.include_router(
 )
 app.include_router(
     websocket_router
+)
+
+app.include_router(
+    connectivity_router
+)
+
+app.include_router(
+    communication_router
 )

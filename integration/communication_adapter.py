@@ -3,7 +3,9 @@ from integration.events import (
     LINK_DOWN,
     LINK_RECOVERED
 )
-
+from backend.services.communication_service import (
+    communication_service
+)
 
 class CommunicationAdapter:
 
@@ -22,8 +24,11 @@ class CommunicationAdapter:
         self,
         satellite_id,
         report
-    ):
-
+    ):  
+        
+        communication_service.update_report(
+             report
+        )
         snr = report["SNR (dB)"]
 
         status = report["Status"]

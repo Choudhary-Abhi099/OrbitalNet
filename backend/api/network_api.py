@@ -11,6 +11,11 @@ from backend.services.network_state_service import (
 from analytics.network_health_service import (
     NetworkHealthService
 )
+
+from analytics.topology_service import (
+    TopologyService
+)
+
 router = APIRouter()
 
 stats_service = (
@@ -19,6 +24,10 @@ stats_service = (
 
 health_service = (
     NetworkHealthService()
+)
+
+topology_service = (
+    TopologyService()
 )
 
 @router.get("/network/statistics")
@@ -59,6 +68,20 @@ def network_health():
     return (
         health_service
         .build_health_report(
+            graph
+        )
+    )
+
+@router.get("/network/topology")
+def network_topology():
+
+    graph = (
+        network_state_service.get_graph()
+    )
+
+    return (
+        topology_service
+        .build_topology(
             graph
         )
     )

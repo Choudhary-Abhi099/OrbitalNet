@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 
-import type {
-    NetworkStats
-} from "../types/network";
+// import type {
+//     NetworkStats
+// } from "../types/network";
+import type { DashboardPayload } from "../types/dashboard";
 
 export function useSimulationSocket() {
 
-    const [stats, setStats] =
-        useState<NetworkStats | null>(
+    const [dashboardData, setDashboardData] =
+        useState<DashboardPayload | null>(
             null
         );
 
@@ -27,7 +28,7 @@ export function useSimulationSocket() {
                     event.data
                 );
 
-            setStats(data);
+            setDashboardData(data);
         };
 
         return () => {
@@ -37,5 +38,5 @@ export function useSimulationSocket() {
 
     }, []);
 
-    return stats;
+    return dashboardData;
 }

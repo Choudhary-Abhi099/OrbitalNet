@@ -142,21 +142,60 @@ def constellation_updated_handler(
         graph
     )
     stats = {
-        "satellites":
-        graph.number_of_nodes(),
 
-        "links":
-        graph.number_of_edges(),
+        "network": {
 
-        "average_degree":
-        round(
-            (
-                2 * graph.number_of_edges()
-            ) /
+            "satellites":
             graph.number_of_nodes(),
-            2
-        )
+
+            "links":
+            graph.number_of_edges(),
+
+            "average_degree":
+            round(
+                (
+                    2 * graph.number_of_edges()
+                ) /
+                graph.number_of_nodes(),
+                2
+            )
+        },
+
+        "connectivity": {
+
+            "user_id":
+            "user-1",
+
+            "connected_satellite":
+            "SCD 1",
+
+            "ground_station":
+            "GS-DELHI",
+
+            "status":
+            "CONNECTED"
+        },
+
+        "communication": {
+
+            "status":
+            "ONLINE",
+
+            "rssi":
+            -79,
+
+            "snr":
+            21,
+
+            "latency":
+            2.1,
+
+            "packet_loss":
+            0.1
+        }
     }
+
+
     live_stats_service.update(
         stats
     )
