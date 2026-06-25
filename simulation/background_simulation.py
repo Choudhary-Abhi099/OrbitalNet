@@ -30,7 +30,33 @@ from simulation.position_update_service import (
 from simulation.scheduler.simulation_clock import (
     SimulationClock
 )
+from backend.services.constellation_state_service import (
+    constellation_state_service
+)
 
+from backend.services.route_state_service import (
+    route_state_service
+)
+
+from simulation.users.user_generator import (
+    UserGenerator
+)
+
+from simulation.routing.best_satellite_selector import (
+    BestSatelliteSelector
+)
+
+from simulation.ground.ground_station_generator import (
+    GroundStationGenerator
+)
+
+from simulation.routing.best_ground_station_selector import (
+    BestGroundStationSelector
+)
+
+from simulation.routing.end_to_end_route import (
+    EndToEndRouter
+)
 def simulation_loop():
 
     loader = TLELoader()
@@ -56,7 +82,9 @@ def simulation_loop():
         constellation_manager.add_satellite(
             satellite
         )
-
+    constellation_state_service.update(
+        constellation_manager
+    )
     event_bus = EventBus()
 
     event_bus.subscribe(
@@ -66,6 +94,28 @@ def simulation_loop():
 
     propagator = OrbitPropagator()
 
+
+    users = (
+        UserGenerator()
+        .generate_users()
+    )
+
+    stations = (
+        GroundStationGenerator()
+        .generate_stations()
+    )
+
+    satellite_selector = (
+        BestSatelliteSelector()
+    )
+
+    ground_selector = (
+        BestGroundStationSelector()
+    )
+
+    router = (
+        EndToEndRouter()
+    )
     position_service = (
         PositionUpdateService(
             constellation_manager,
@@ -83,7 +133,40 @@ def simulation_loop():
     while True:
 
         clock.tick()
+        routes = []
 
+        for user in users:
+
+            satellite_result = (
+                satellite_selector
+                .select_best_satellite(
+                    user,
+                    constellation_manager
+                    .get_all_satellites()
+                )
+            )
+
+            ground_station_result = (
+                ground_selector
+                .select_best_station(
+                    satellite_result["satellite"],
+                    stations
+                )
+            )
+
+            route = (
+                router.build_route(
+                    user,
+                    satellite_result,
+                    ground_station_result
+                )
+            )
+
+            routes.append(route)
+
+        route_state_service.update(
+            routes
+        )
         time.sleep(5)
 
 def start_background_simulation():

@@ -14,3 +14,8 @@ class ConstellationManager:
 
     def satellite_count(self):
         return len(self.satellites)
+    
+
+constellation_manager = (
+    ConstellationManager()
+)

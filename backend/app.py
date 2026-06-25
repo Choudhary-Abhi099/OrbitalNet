@@ -48,6 +48,18 @@ from backend.api.communication_api import (
     router as communication_router
 )
 
+from backend.api.satellite_api import (
+    router as satellite_router
+)
+
+from backend.api.ground_station_api import (
+    router as ground_station_router
+)
+
+from backend.api.routes_api import (
+    router as routes_router
+)
+
 app = FastAPI()
 
 app.add_middleware(
@@ -129,4 +141,16 @@ app.include_router(
 
 app.include_router(
     communication_router
+)
+
+app.include_router(
+    satellite_router
+)
+
+app.include_router(
+    ground_station_router
+)
+
+app.include_router(
+    routes_router
 )
