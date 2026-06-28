@@ -57,6 +57,11 @@ from simulation.routing.best_ground_station_selector import (
 from simulation.routing.end_to_end_route import (
     EndToEndRouter
 )
+
+from backend.services.orbit_path_state_service import (
+    orbit_path_service
+)
+
 def simulation_loop():
 
     loader = TLELoader()
@@ -93,7 +98,13 @@ def simulation_loop():
     )
 
     propagator = OrbitPropagator()
+    
+    for satellite in satellites:
 
+        orbit_path_service.generate_path(
+            satellite,
+            propagator
+        )
 
     users = (
         UserGenerator()

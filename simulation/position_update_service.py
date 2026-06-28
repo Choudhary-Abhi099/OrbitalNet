@@ -2,6 +2,10 @@ from integration.events import (
     CONSTELLATION_UPDATED
 )
 
+from backend.services.orbit_trail_state_service import (
+    orbit_trail_service
+)
+
 
 class PositionUpdateService:
 
@@ -34,6 +38,10 @@ class PositionUpdateService:
         for satellite in satellites:
 
             self.propagator.update_position(
+                satellite
+            )
+
+            orbit_trail_service.add_position(
                 satellite
             )
 

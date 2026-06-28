@@ -59,7 +59,13 @@ from backend.api.ground_station_api import (
 from backend.api.routes_api import (
     router as routes_router
 )
+from backend.api.orbit_trails_api import (
+    router as orbit_trails_router
+)
 
+from backend.api.orbit_paths_api import (
+    router as orbit_paths_router
+)
 app = FastAPI()
 
 app.add_middleware(
@@ -153,4 +159,11 @@ app.include_router(
 
 app.include_router(
     routes_router
+)
+app.include_router(
+    orbit_trails_router
+)
+
+app.include_router(
+    orbit_paths_router
 )
