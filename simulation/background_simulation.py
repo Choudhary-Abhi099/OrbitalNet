@@ -61,6 +61,13 @@ from simulation.routing.end_to_end_route import (
 from backend.services.orbit_path_state_service import (
     orbit_path_service
 )
+from simulation.routing.visibility_link_generator import (
+    VisibilityLinkGenerator
+)
+
+from backend.services.visibility_link_state_service import (
+    visibility_link_state_service
+)
 
 def simulation_loop():
 
@@ -110,7 +117,9 @@ def simulation_loop():
         UserGenerator()
         .generate_users()
     )
-
+    visibility_generator = (
+        VisibilityLinkGenerator()
+    )
     stations = (
         GroundStationGenerator()
         .generate_stations()
@@ -177,6 +186,18 @@ def simulation_loop():
 
         route_state_service.update(
             routes
+        )
+        visibility_links = (
+            visibility_generator
+            .generate_links(
+                 constellation_manager
+                .get_all_satellites(),
+            stations
+            )
+        )
+
+        visibility_link_state_service.update(
+            visibility_links
         )
         time.sleep(5)
 

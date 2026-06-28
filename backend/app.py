@@ -66,6 +66,10 @@ from backend.api.orbit_trails_api import (
 from backend.api.orbit_paths_api import (
     router as orbit_paths_router
 )
+
+from backend.api.visibility_links_api import (
+    router as visibility_links_router
+)
 app = FastAPI()
 
 app.add_middleware(
@@ -166,4 +170,8 @@ app.include_router(
 
 app.include_router(
     orbit_paths_router
+)
+
+app.include_router(
+    visibility_links_router
 )
